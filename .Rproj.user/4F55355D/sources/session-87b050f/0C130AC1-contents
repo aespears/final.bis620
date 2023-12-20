@@ -1,0 +1,145 @@
+---
+title: "DS$^3$ 2022-09-06 (and 2022-09-08)"
+format: html
+---
+
+# Office hours
+
+Michael: Tuesday 1-3
+
+Yongzhuo (Yorick) Chen: Thursday 1-3
+
+Jiayi (Jessica) Wang: 
+
+# Review
+
+## Importing the data and the data dictionary
+
+```{r}
+library(readr)
+library(DT)
+library(dplyr)
+library(sf)
+sf_use_s2(FALSE)
+
+dd <- read_csv(file.path( "2018-data", "data-dictionary-2018.csv"))
+
+dd |> 
+  select(var_name, description) |>
+  datatable()
+```
+
+```{r}
+library(sf)
+d <- read_sf(file.path("2018-data", "SVI2018_US_tract.shp"))
+d
+```
+
+# Cleaning
+
+```{r}
+library(purrr)
+library(dplyr)
+
+# ~ -> what you do to each of the arguments
+# .x 
+d <- d |>
+  mutate_if(is.numeric, ~ ifelse(.x == -999, NA, .x))
+d
+```
+```{r}
+# aside - use case_when() for when you have more than 1 case for ifelse()
+```
+
+
+# Spatial data exploration
+
+## The data
+
+```{r}
+library(gtsummary)
+d |> 
+  filter(STATE == "CALIFORNIA") |>
+  as_tibble() |>
+  select(AREA_SQMI, E_UNEMP, E_POV, E_PCI) |>
+  tbl_summary(missing_text = "NA")
+```
+
+## Conditional summaries
+
+```{r}
+d |> 
+  filter(STATE == "CALIFORNIA") |>
+  as_tibble() |>
+  select(AREA_SQMI, E_UNEMP, E_POV, E_PCI, COUNTY) |>
+  tbl_summary(by = "COUNTY", missing_text = "NA")
+```
+
+## Which counties in California have the biggest difference in census tract GDPs?
+
+```{r}
+ctd = d |>
+  filter(STATE == "CALIFORNIA") |>
+  group_by(COUNTY) |>
+  # maximum per capita income / minimum per capita income
+  summarize(disparity = max(E_PCI, na.rm = TRUE) / min(E_PCI, na.rm = TRUE),
+            num_fips = length(E_PCI)) |>
+  suppressMessages()
+
+ctd |> 
+  as_tibble() |>
+  select(-geometry) |>
+  mutate(Disparity = round(disparity, 2)) |>
+  rename('Number FIPS' = num_fips) |>
+  select(-disparity) |>
+  datatable()
+
+# disparity = 1 (misleading since there's only 1 fips area in that county)
+```
+
+# How do we visualize this?
+
+```{r}
+library(ggplot2)
+
+p1 = ggplot(ctd, aes(geometry = geometry, fill = log10(disparity))) +
+  geom_sf() +
+  theme_bw()
+
+p1
+```
+
+```{r}
+library(viridis) # for scale_fill_viridis()
+library(patchwork)
+
+p2 = ggplot(ctd, aes(geometry = geometry, fill = log10(disparity))) +
+  geom_sf() +
+  scale_fill_viridis() +
+  theme_bw()
+
+p1 + p2
+```
+
+```{r}
+
+disp = d |>
+  as_tibble() |>
+  group_by(STATE, COUNTY) |>
+  summarize(
+    disparity = max(E_PCI, na.rm = TRUE) / min(E_PCI, na.rm = TRUE),
+    num_fips = length(E_PCI),
+    .groups = "drop") |>
+  filter(is.finite(disparity)) |> # get rid of any NAs/NaNs
+  arrange(desc(disparity)) |>
+  mutate(state_county = paste(STATE, COUNTY)) |>
+  mutate(state_county = factor(state_county, levels = state_county))
+
+ggplot(disp, aes(x = num_fips, y = disparity)) +
+  scale_y_log10() +
+  scale_x_log10() +
+  geom_point() +
+  ylab("Disparity") +
+  xlab("County Size (in Number of FIPS Areas)") +
+  theme_bw() # minimal theming looks cleaner; theme_bw() or theme_minimal()
+```

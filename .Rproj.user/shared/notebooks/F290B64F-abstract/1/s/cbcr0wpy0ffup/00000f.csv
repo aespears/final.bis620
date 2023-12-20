@@ -1,0 +1,2 @@
+"0","df$day_dif <- day_dif(df$E_DAYPOP, df$E_TOTPOP)"
+"0","df$pct_day_dif <- pct_day_dif(df$E_DAYPOP, df$E_TOTPOP)"
