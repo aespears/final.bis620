@@ -16,10 +16,13 @@ Depends:
 Imports: 
   dplyr,
   ggplot2,
-  viridis
+  viridis,
+  tidyr
 Suggests: 
     knitr,
     rmarkdown,
-    tidyr,
-    sf
+    sf,
+    testthat (>= 3.0.0),
+    vdiffr
 VignetteBuilder: knitr
+Config/testthat/edition: 3

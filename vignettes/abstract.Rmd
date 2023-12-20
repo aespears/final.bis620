@@ -1,6 +1,6 @@
 ---
 title: "Final Project: Study of Daytime and Total Populations"
-output: rmarkdown::html_vignette
+output: rmarkdown::pdf_document
 vignette: >
   %\VignetteIndexEntry{abstract}
   %\VignetteEngine{knitr::rmarkdown}
@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 ```{r setup}
@@ -62,6 +63,7 @@ plot_hist(df, 'day_change', "Daytime Increase in Population")
 
 If we just plot the raw change in population during the day, we see many values close to zero and a few very very large increases or decreases. This could be skewed though by areas with high population density and larger populations in general, such as in New York City.
 
+
 It may be more helpful though to look at the percent increase rather than the raw increase in order to account for regions with higher population density and larger populations in general. 
 
 As we can see in our new histogram, most regions changed by only a small amount, but a few select areas increase by more than 50x or 100x their original population. Even if we filter out only populations in which the percent change in population is more than 100% 
@@ -69,7 +71,7 @@ As we can see in our new histogram, most regions changed by only a small amount,
 df |> dplyr::filter(abs(pct_day_change) < 50) |> 
 plot_hist('pct_day_change', "Daytime Percent Increase in Population")
 ```
-If we plot this, it becomes very hard to interpret.
+If we plot this, it is somewhat hard to interpret due to the skew. 
 
 Let's make a few more plots to explore this relationship further!
 
@@ -96,7 +98,7 @@ ct_df |>
 ```
 It's interesting to see how these are scattered throughout the state - we don't see as much of a focus around city centers. 
 
-If we plot the region's total population vs the change in population during the day, we see a fairly even spread between increases and decreases across the two total population groups. So even though we see the highest increase during the day in densely populated urban areas like Hartford, it is not the only 
+If we plot the region's total population vs the change in population during the day, we see a fairly even spread between increases and decreases across the two total population groups. So even though we see the highest increase during the day in densely populated urban areas like Hartford, it is not the only factor that would contribute to an increase in population during the day.
 
 ```{r}
 ct_df |> ggplot(aes(x = E_TOTPOP, y = day_change, col = increase)) + geom_point() + theme_bw() + labs(title = "Connecticut Population vs Daytime Change")
@@ -110,49 +112,52 @@ df_filtered <- df |> as.data.frame() |> select(ST_ABBR, starts_with('E_'), day_c
 
 
 ```{r}
-df_filtered |> as.data.frame() |> tidyr::pivot_longer(cols = -c(ST_ABBR, increase, pct_day_change, day_change)) |>
-  ggplot(aes(x = value)) + geom_histogram() + facet_wrap(~name, scale = 'free_x')
+facet_hist(df_filtered, cols = c('ST_ABBR', 'increase', 'pct_day_change', 'day_change'),
+           title = "Variable histograms") 
 ```
 Almost all of these values seem very far skewed to the right. Let's log transform them to make them more normal for model fitting.
 
 ```{r}
-df_filtered |> as.data.frame() |> tidyr::pivot_longer(cols = -c(ST_ABBR, increase, pct_day_change, day_change)) |>
-  ggplot(aes(x = log(value))) + geom_histogram() + facet_wrap(~name, scale = 'free_x')
+df_logtrans <- log_trans(df_filtered, c(starts_with('E_')))
+facet_hist(df_logtrans, cols = c('ST_ABBR', 'increase', 'pct_day_change', 'day_change'),
+           "Log transformed variable histograms")
 ```
 
-These look much more symmetric. Let's keep them!
+These look much more symmetric, aside from some spikes at 0. Let's keep them like this for now.
+
+
 
 
 # Analysis
 
-Let us now try and fit a regression model to predict how many people will 
+Let us now try and fit a regression model to predict how many people will enter or leave an area during the daytime.
 
 ```{r}
-df_filtered <- df_filtered |> as.data.frame() |> filter(ST_ABBR == 'CT')
-
-temp <- df_filtered |> select(-ST_ABBR, -E_DAYPOP, -pct_day_change, -increase)
-summary(lm1 <- lm(day_change ~ ., temp))
+model_data <- df_logtrans|> select(-ST_ABBR, -log_E_DAYPOP, -pct_day_change, -increase, -log_E_HH)
+summary(lm1 <- lm(day_change ~ ., model_data))
 ```
 
+We find a lot of these variables are significant! However, our R-squared is quite low, which suggests that the variables account for only a small amount of the variability in daytime population change.   
+
+There are a few factors that could be causing this. My main thought is that there is a great deal of skew in many of our variables because of the proportionally smaller number of FIPS regions with very high populations, as well as how many of our measurements have large spikes at 0.
+
+Future study must take into account the skew, outliers, and heteroscedasticity of these variables with some transformations and other filtering steps in order to get more accurate predictions.Plotting the residuals against the fitted values shows a slightly odd triangular relationship with a few outliers. 
 ```{r}
-# df_predict_increase <- df_filtered |> mutate(increase_tf = as.numeric(day_change > 0))
-# 
-# temp <- df_predict_increase |> select(-ST_ABBR,  -E_DAYPOP, -pct_day_change, -day_change, -increase)
-# summary(glm1 <- glm(increase_tf ~ ., temp, family = 'binomial'))
+resid_plot(lm1)
 ```
 
-```{r}
-# res <- as.numeric(predict(glm1, newdata = temp, type = 'response') > 0.5)
-# mean(res == temp$increase_tf, na.rm = T)
-```
 
 
 # Interpretation and Conclusion
-```{r}
 
-```
+Now we will interpret these variables in the context of social vulnerability. In particular, we observed significant coefficients relating to household factors as well as to employment. 
+
+One that stands out is a positive coefficient relating to `log_E_PCI`, referring to per capita income. In areas where the residents have higher average income, we see a large influx of population during the day.
+This may mean that these areas have too high of a cost of living, and most of those who work in that area live elsewhere where it may be more affordable. 
+
+However, we see negative relationships in areas with higher numbers of people age 65+ or under 17. This may be related to the fact that often retirees or people with young children live in areas outside of urban centers, where the average worker does not live.
+
+Overall, while not definitive, these results provide a bit of preliminary insight to what factors might be contributing to changes in area population during the day. These results are crucial when taking to account factors like transportation, commutes, housing, and zoning. It is important to recognize where people spend their day relative to where they live when making decisions on urban planning. Future analysis should also take into account factors like housing costs, public transport, and urbanization in order to get a more definitive analysis of daytime population.
 
 
-```{r}
-```
 

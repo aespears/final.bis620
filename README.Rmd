@@ -20,38 +20,32 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/aespears/final.bis620/branch/main/graph/badge.svg)](https://app.codecov.io/gh/aespears/final.bis620?branch=main)
 <!-- badges: end -->
 
-The goal of final.bis620 is to ...
+The goal of final.bis620 is to look at the Social Vulnerability dataset and analyze what differentiates regions where the population increases during the day and regions where the population decreases during the day.
 
 ## Installation
 
 You can install the development version of final.bis620 from [GitHub](https://github.com/) with:
 
-``` r
+``` {r}
 # install.packages("devtools")
 devtools::install_github("aespears/final.bis620")
 ```
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This plot shows how 
 
 ```{r example}
 library(final.bis620)
-## basic example code
+library(sf)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+```{r}
+ct <- fips_data |> dplyr::filter(ST_ABBR == 'CT')
+ct$day_change <- day_dif(ct$E_DAYPOP, ct$E_TOTPOP)
 
-```{r cars}
-summary(cars)
+plot_map(ct, 'geometry', 'day_change', 'Daytime Population Change in Connecticut')
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+In the analysis described in the vignette, we explore factors that contribute to a change in population like this,
+including Per Capita Income and population demographics that might mean people are more likely to commute.

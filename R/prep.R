@@ -38,3 +38,23 @@ pct_day_dif <- function(day, total){
   ifelse(total != 0, (day-total)/total, ifelse(day == 0, 0, 1))
 }
 
+#' Log transform columns
+#'
+#' This function log transforms all of the indicated columns in a dataframe
+#' and replaces the original columns with new ones titled `log_name`
+#'
+#' @param df A dataframe with columns to be transformed
+#' @param cols The columns to be log_transformed, a <tidy-select>
+#' @returns A new dataframe with all the indicated columns replaced by log transformed versions
+#'
+#' @importFrom dplyr mutate select
+#' @export
+log_trans <- function(df, cols){
+
+  logs <- df |> select(all_of(cols)) |> apply(2, function(x) log(x + 1)) |> as.data.frame()
+  names(logs) <- paste0('log_', names(logs))
+
+  cbind(df |> select(-all_of(cols)), logs)
+}
+
+

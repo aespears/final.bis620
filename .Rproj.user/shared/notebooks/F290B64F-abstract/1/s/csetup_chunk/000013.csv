@@ -1,8 +1,0 @@
-"0","library(final.bis620)"
-"0","library(sf)"
-"2","Linking to GEOS 3.11.0, GDAL 3.5.3, PROJ 9.1.0; sf_use_s2() is TRUE
-"
-"0","library(dplyr)"
-"0","library(ggplot)"
-"2","Error in library(ggplot) : there is no package called ‘ggplot’
-"

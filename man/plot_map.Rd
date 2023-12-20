@@ -5,8 +5,6 @@
 \title{Generate a colored map}
 \usage{
 plot_map(df, geometry, fill, title = "Map")
-
-plot_map(df, geometry, fill, title = "Map")
 }
 \arguments{
 \item{df}{A data frame}
@@ -18,12 +16,8 @@ plot_map(df, geometry, fill, title = "Map")
 \item{title}{The title of the map plot (default is "Map").}
 }
 \value{
-A ggplot object representing the histogram.
-
-A ggplot object representing the histogram.
+A ggplot object representing the map
 }
 \description{
-This function takes a geometry object and fill scale creates a shaded map using ggplot2.
-
 This function takes a geometry object and fill scale creates a shaded map using ggplot2.
 }
