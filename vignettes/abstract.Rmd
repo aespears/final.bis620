@@ -1,6 +1,6 @@
 ---
 title: "Final Project: Study of Daytime and Total Populations"
-output: rmarkdown::pdf_document
+output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{abstract}
   %\VignetteEngine{knitr::rmarkdown}
@@ -57,7 +57,7 @@ Let us visualize these differences now. First we look at the difference, which i
 simply the daytime population minus the total population estimate. A positive difference means that there is an increase in population during the day, i.e. people come into the area that do not live there, whereas a negative difference means that there is a decrease in population during the day, i.e people who live in the area leave the area.
 
 ```{r}
-plot_hist(df, 'day_change', "Daytime Increase in Population")
+plot_hist(df, "day_change", "Daytime Increase in Population")
 
 ```
 
@@ -69,7 +69,7 @@ It may be more helpful though to look at the percent increase rather than the ra
 As we can see in our new histogram, most regions changed by only a small amount, but a few select areas increase by more than 50x or 100x their original population. Even if we filter out only populations in which the percent change in population is more than 100% 
 ```{r}
 df |> dplyr::filter(abs(pct_day_change) < 50) |> 
-plot_hist('pct_day_change', "Daytime Percent Increase in Population")
+  plot_hist("pct_day_change", "Daytime Percent Increase in Population")
 ```
 If we plot this, it is somewhat hard to interpret due to the skew. 
 
@@ -77,53 +77,59 @@ Let's make a few more plots to explore this relationship further!
 
 First, let's look at a few maps, focusing on Connecticut for now.
 ```{r}
-ct_df <- df |> dplyr::filter(ST_ABBR == 'CT') 
+ct_df <- df |> dplyr::filter(ST_ABBR == "CT") 
 ```
 
 ```{r}
-ct_df |> plot_map('geometry', 'day_change')
+ct_df |> plot_map("geometry", "day_change")
 ```
 Just plotting the daytime population change, we see most areas only change a small amount, but it's obscured greatly by the huge increase in daytime population in urban areas like Hartford. For the bulk of the state, it's hard to tell if the population increases or decreases because it all falls within the purple color
 
 Let's try something else. Let's color in our map simply by the binary measure of population increases during the day or decreases during the day.
 
 ```{r}
-df <- df |> mutate(increase = ifelse(day_change > 0, 'increase', 'decrease'))
-ct_df <- ct_df |> dplyr::mutate(increase = ifelse(day_change > 0, 'increase', 'decrease'))
+df <- df |> mutate(increase = ifelse(day_change > 0, "increase", "decrease"))
+ct_df <- ct_df |> dplyr::mutate(increase = ifelse(day_change > 0, 
+                                                  "increase", "decrease"))
 ```
 
 ```{r}
 ct_df |> 
-  plot_map('geometry', 'increase', 'Daytime Change in Population')
+  plot_map("geometry", "increase", "Daytime Change in Population")
 ```
 It's interesting to see how these are scattered throughout the state - we don't see as much of a focus around city centers. 
 
 If we plot the region's total population vs the change in population during the day, we see a fairly even spread between increases and decreases across the two total population groups. So even though we see the highest increase during the day in densely populated urban areas like Hartford, it is not the only factor that would contribute to an increase in population during the day.
 
 ```{r}
-ct_df |> ggplot(aes(x = E_TOTPOP, y = day_change, col = increase)) + geom_point() + theme_bw() + labs(title = "Connecticut Population vs Daytime Change")
+ct_df |> ggplot(aes(x = E_TOTPOP, y = day_change, col = increase)) + 
+  geom_point() + 
+  theme_bw() + 
+  labs(title = "Connecticut Population vs Daytime Change")
 ```
 
 So now we consider, what factors do play a role in increased or decreased daytime population? Let's make a few observations and visualizations.
 First, we do a little bit more data cleaning, as many of the columns in our original data source are redundant as they give percentiles or flags for certain population metrics.
 ```{r}
-df_filtered <- df |> as.data.frame() |> select(ST_ABBR, starts_with('E_'), day_change, pct_day_change, increase)
+df_filtered <- df |> as.data.frame() |> 
+  select(ST_ABBR, starts_with("E_"), day_change, pct_day_change, increase)
 ```
 
 
 ```{r}
-facet_hist(df_filtered, cols = c('ST_ABBR', 'increase', 'pct_day_change', 'day_change'),
+facet_hist(df_filtered, cols = c("ST_ABBR", "increase", "pct_day_change", "day_change"),
            title = "Variable histograms") 
 ```
 Almost all of these values seem very far skewed to the right. Let's log transform them to make them more normal for model fitting.
 
 ```{r}
-df_logtrans <- log_trans(df_filtered, c(starts_with('E_')))
-facet_hist(df_logtrans, cols = c('ST_ABBR', 'increase', 'pct_day_change', 'day_change'),
+df_logtrans <- log_trans(df_filtered, c(starts_with("E_")))
+facet_hist(df_logtrans, 
+           cols = c("ST_ABBR", "increase", "pct_day_change", "day_change"),
            "Log transformed variable histograms")
 ```
 
-These look much more symmetric, aside from some spikes at 0. Let's keep them like this for now.
+These look much more symmetric, aside from some spikes at 0. Let"s keep them like this for now.
 
 
 
@@ -133,7 +139,8 @@ These look much more symmetric, aside from some spikes at 0. Let's keep them lik
 Let us now try and fit a regression model to predict how many people will enter or leave an area during the daytime.
 
 ```{r}
-model_data <- df_logtrans|> select(-ST_ABBR, -log_E_DAYPOP, -pct_day_change, -increase, -log_E_HH)
+model_data <- df_logtrans|> select(-ST_ABBR, -log_E_DAYPOP, -pct_day_change, 
+                                   -increase, -log_E_HH)
 summary(lm1 <- lm(day_change ~ ., model_data))
 ```
 

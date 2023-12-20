@@ -27,5 +27,5 @@
 #'   \item{COUNTY}{FIPS}
 #'   ...
 #' }
-#' @source <https://www.atsdr.cdc.gov/placeandhealth/svi/data_documentation_download.html>
+#' @source <https://www.atsdr.cdc.gov/placeandhealth/svi/>
 "fips_data"
