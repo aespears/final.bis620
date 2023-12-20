@@ -62,7 +62,7 @@ plot_map <- function(df, geometry, fill, title = "Map") {
 #' @return A ggplot object representing the histogram.
 #'
 #'
-#' @importFrom ggplot2 ggplot aes labs theme_bw
+#' @importFrom ggplot2 ggplot aes labs theme_bw geom_sf
 #' @importFrom viridis scale_fill_viridis
 #' @export
 plot_map <- function(df, geometry, fill, title = "Map") {

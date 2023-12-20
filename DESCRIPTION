@@ -8,6 +8,7 @@ Description: This package looks at the difference between total and daytime popu
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
+LazyDataCompression: xz
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Depends: 
@@ -15,10 +16,10 @@ Depends:
 Imports: 
   dplyr,
   ggplot2,
-  sf,
-  viridis,
-  tidyr
+  viridis
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    tidyr,
+    sf
 VignetteBuilder: knitr
