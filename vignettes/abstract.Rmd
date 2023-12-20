@@ -63,7 +63,6 @@ plot_hist(df, "day_change", "Daytime Increase in Population")
 
 If we just plot the raw change in population during the day, we see many values close to zero and a few very very large increases or decreases. This could be skewed though by areas with high population density and larger populations in general, such as in New York City.
 
-
 It may be more helpful though to look at the percent increase rather than the raw increase in order to account for regions with higher population density and larger populations in general. 
 
 As we can see in our new histogram, most regions changed by only a small amount, but a few select areas increase by more than 50x or 100x their original population. Even if we filter out only populations in which the percent change in population is more than 100% 
@@ -73,9 +72,7 @@ df |> dplyr::filter(abs(pct_day_change) < 50) |>
 ```
 If we plot this, it is somewhat hard to interpret due to the skew. 
 
-Let's make a few more plots to explore this relationship further!
-
-First, let's look at a few maps, focusing on Connecticut for now.
+Let's make a few more plots to explore this relationship further! First, let's look at a few maps, focusing on Connecticut for now.
 ```{r}
 ct_df <- df |> dplyr::filter(ST_ABBR == "CT") 
 ```
@@ -114,7 +111,6 @@ First, we do a little bit more data cleaning, as many of the columns in our orig
 df_filtered <- df |> as.data.frame() |> 
   select(ST_ABBR, starts_with("E_"), day_change, pct_day_change, increase)
 ```
-
 
 ```{r}
 facet_hist(df_filtered, cols = c("ST_ABBR", "increase", "pct_day_change", "day_change"),

@@ -9,7 +9,8 @@ facet_hist(df, cols, title = "Histograms")
 \arguments{
 \item{df}{A data frame}
 
-\item{cols}{A character vector of the columns you do not want faceted, such as unique identifiers}
+\item{cols}{A character vector of the columns you do not want faceted, such
+as unique identifiers}
 
 \item{title}{The title of the map plot (default is "Histograms").}
 }

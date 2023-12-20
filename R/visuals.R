@@ -11,7 +11,7 @@
 #'
 #' @importFrom ggplot2 ggplot aes geom_histogram labs theme_bw
 #' @export
-plot_hist <- function (df, col, title = "Histogram") {
+plot_hist <- function(df, col, title = "Histogram") {
 
   # Create ggplot object for the histogram
   ggplot(df, aes(x = !!as.symbol(col))) +
@@ -36,7 +36,7 @@ plot_hist <- function (df, col, title = "Histogram") {
 #' @importFrom ggplot2 ggplot aes labs theme_bw geom_sf
 #' @importFrom viridis scale_fill_viridis
 #' @export
-plot_map <- function (df, geometry, fill, title = "Map") {
+plot_map <- function(df, geometry, fill, title = "Map") {
   # If continuous use viridis color fill
   if (is.numeric(df[[fill]])) {
     ggplot(df, aes(geometry = !!as.symbol(geometry),
@@ -88,7 +88,7 @@ facet_hist <- function(df, cols, title = "Histograms") {
 #' @importFrom ggplot2 ggplot aes labs theme_bw geom_point
 #' @export
 
-resid_plot <- function (lm1, title = 'Residuals' ) {
+resid_plot <- function(lm1, title = "Residuals") {
   data.frame("residuals" = lm1[["residuals"]],
              "fitted.values" = lm1[["fitted.values"]]) |>
     ggplot(aes(x = !!as.symbol("residuals"),

@@ -12,7 +12,7 @@ log_trans(df, cols)
 \item{cols}{The columns to be log_transformed, a \if{html}{\out{<tidy-select>}}}
 }
 \value{
-A new dataframe with all the indicated columns replaced by log transformed versions
+A new dataframe with indicated columns log transformed
 }
 \description{
 This function log transforms all of the indicated columns in a dataframe

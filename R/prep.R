@@ -18,7 +18,7 @@ fix999 <- function(df) {
 #'
 #'
 #' @export
-day_dif <- function (day, total) {
+day_dif <- function(day, total) {
   day - total
 }
 
@@ -34,7 +34,7 @@ day_dif <- function (day, total) {
 #'
 #'
 #' @export
-pct_day_dif <- function (day, total) {
+pct_day_dif <- function(day, total) {
   ifelse(total != 0, (day - total) / total, ifelse(day == 0, 0, 1))
 }
 
@@ -49,9 +49,10 @@ pct_day_dif <- function (day, total) {
 #'
 #' @importFrom dplyr mutate select
 #' @export
-log_trans <- function (df, cols) {
-
-  logs <- df |> select(all_of(cols)) |> apply(2, function(x) log(x + 1)) |>
+log_trans <- function(df, cols) {
+  logs <- df |>
+    select(all_of(cols)) |>
+    apply(2, function(x) log(x + 1)) |>
     as.data.frame()
   names(logs) <- paste0("log_", names(logs))
 

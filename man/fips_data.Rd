@@ -19,7 +19,7 @@ A data frame with 72837 rows and 127 columns:
 }
 }
 \source{
-\url{https://www.atsdr.cdc.gov/placeandhealth/svi/data_documentation_download.html}
+\url{https://www.atsdr.cdc.gov/placeandhealth/svi/}
 }
 \usage{
 fips_data

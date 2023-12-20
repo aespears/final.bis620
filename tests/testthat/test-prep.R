@@ -5,13 +5,13 @@ test_that("fix999 works", {
   ind <- sample(1:100, 10)
 
   # In one set indices to -999
-  s999 <- s
-  s999$a[ind] <- -999
+  s_999 <- s
+  s_999$a[ind] <- -999
 
   # In other set indices to NA
-  sNA <- s
-  sNA$a[ind] <- NA
-  expect_equal(sNA, fix999(s999))
+  s_NA <- s
+  s_NA$a[ind] <- NA
+  expect_equal(s_NA, fix999(s_999))
 })
 
 test_that("day_dif works", {
@@ -20,7 +20,7 @@ test_that("day_dif works", {
 })
 
 test_that("pct_day_dif works", {
-  pct <- (iris$Sepal.Length - iris$Sepal.Width)/iris$Sepal.Width
+  pct <- (iris$Sepal.Length - iris$Sepal.Width) / iris$Sepal.Width
   expect_equal(pct, pct_day_dif(iris$Sepal.Length, iris$Sepal.Width))
 })
 

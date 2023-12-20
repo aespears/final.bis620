@@ -7,7 +7,7 @@
 fix999(df)
 }
 \arguments{
-\item{df}{A dataframe in which some cells have values of -999 to represent missing values}
+\item{df}{A dataframe that has values of -999 to represent missing values}
 }
 \value{
 The same dataframe but all -999s have been replaced with NA

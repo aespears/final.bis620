@@ -19,5 +19,6 @@ plot_map(df, geometry, fill, title = "Map")
 A ggplot object representing the map
 }
 \description{
-This function takes a geometry object and fill scale creates a shaded map using ggplot2.
+This function takes a geometry object and fill scale variable
+to create a shaded map using ggplot2.
 }

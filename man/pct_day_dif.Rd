@@ -15,7 +15,7 @@ pct_day_dif(day, total)
 A new column giving the difference between day and total
 }
 \description{
-This function accounts for when total area pop is 0 - If there is any increase
+This function accounts for when total pop is 0 - If there is any increase
 in population during the day, we simplify to say it is a 100\% increase.
 If day and total pop are both 0, we say percent change is 0.
 }
